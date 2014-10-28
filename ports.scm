@@ -230,9 +230,8 @@
 			  last) ] ) ) )
 	     #f				; write-char
 	     #f				; write-string
-	     (lambda (p)		; close
-	       (close)
-	       (##sys#setislot p 8 #t) )
+	     (lambda (p d)		; close
+	       (close))
 	     #f				; flush-output
 	     (lambda (p)		; char-ready?
 	       (ready?) )
@@ -240,7 +239,7 @@
 	     read-line			; read-line
 	     read-buffered))
 	   (data (vector #f))
-	   (port (##sys#make-port #t class "(custom)" 'custom)) )
+	   (port (##sys#make-port 1 class "(custom)" 'custom)))
       (##sys#set-port-data! port data) 
       port) ) )
 
@@ -254,15 +253,14 @@
 	       (write (string c)) )
 	     (lambda (p s)		; write-string
 	       (write s) )
-	     (lambda (p)		; close
-	       (close)
-	       (##sys#setislot p 8 #t) )
+	     (lambda (p d)		; close
+	       (close))
 	     (lambda (p)		; flush-output
 	       (when flush (flush)) )
 	     #f				; char-ready?
 	     #f				; read-string!
 	     #f) )			; read-line
 	   (data (vector #f))
-	   (port (##sys#make-port #f class "(custom)" 'custom)) )
+	   (port (##sys#make-port 2 class "(custom)" 'custom)))
       (##sys#set-port-data! port data) 
       port) ) )
