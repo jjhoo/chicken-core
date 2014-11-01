@@ -1175,8 +1175,6 @@ extern double trunc(double);
 #define C_vectorp(x)              C_mk_bool(C_header_bits(x) == C_VECTOR_TYPE)
 #define C_bytevectorp(x)          C_mk_bool(C_header_bits(x) == C_BYTEVECTOR_TYPE)
 #define C_portp(x)                C_mk_bool(C_header_bits(x) == C_PORT_TYPE)
-#define C_input_portp(x)          C_mk_bool(C_header_bits(x) == C_PORT_TYPE && C_block_item(x, 1) & 0x2)
-#define C_output_portp(x)         C_mk_bool(C_header_bits(x) == C_PORT_TYPE && C_block_item(x, 1) & 0x4)
 #define C_structurep(x)           C_mk_bool(C_header_bits(x) == C_STRUCTURE_TYPE)
 #define C_locativep(x)            C_mk_bool(C_block_header(x) == C_LOCATIVE_TAG)
 #define C_charp(x)                C_mk_bool(((x) & C_IMMEDIATE_TYPE_BITS) == C_CHARACTER_BITS)
@@ -1199,6 +1197,14 @@ extern double trunc(double);
 #define C_notvemptyp(x)           C_mk_bool(C_header_size(x) > 0)
 #define C_u_i_exactp(x)           C_mk_bool((x) & C_FIXNUM_BIT)
 #define C_u_i_inexactp(x)         C_mk_bool(((x) & C_FIXNUM_BIT) == 0)
+
+#define C_port_typep(x, n)        C_mk_bool((C_block_item(x, 1) & n) == n)
+#define C_input_portp(x)          C_and(C_portp(x), C_port_typep(x, 0x2))
+#define C_output_portp(x)         C_and(C_portp(x), C_port_typep(x, 0x4))
+
+#define C_port_openp(port, n)     C_mk_bool((C_block_item(port, 8) & n) == n)
+#define C_input_port_openp(port)  C_port_openp(port, 0x2)
+#define C_output_port_openp(port) C_port_openp(port, 0x4)
 
 #define C_slot(x, i)              C_block_item(x, C_unfix(i))
 #define C_subbyte(x, i)           C_fix(((C_byte *)C_data_pointer(x))[ C_unfix(i) ] & 0xff)

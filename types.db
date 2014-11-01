@@ -633,6 +633,8 @@
 (open-output-file (#(procedure #:clean #:enforce) open-output-file (string #!rest symbol) output-port))
 (close-input-port (#(procedure #:enforce) close-input-port (input-port) undefined))
 (close-output-port (#(procedure #:enforce) close-output-port (output-port) undefined))
+(input-port-open? (#(procedure #:enforce) input-port-open? (input-port) boolean))
+(output-port-open? (#(procedure #:enforce) output-port-open? (output-port) boolean))
 (load (procedure load (string #!optional (procedure (*) . *)) undefined))
 (read (#(procedure #:enforce) read (#!optional input-port) *))
 
