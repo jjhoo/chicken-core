@@ -24,9 +24,6 @@
 ; POSSIBILITY OF SUCH DAMAGE.
 
 
-(declare
- (unit build-version))
-
 (foreign-declare "#include \"buildtag.h\"")
 
 ;; (read-version filename): Read line from FILENAME and return

@@ -38,7 +38,7 @@ SETUP_API_OBJECTS_1 = setup-api setup-download
 LIBCHICKEN_SCHEME_OBJECTS_1 = \
        library eval data-structures ports files extras lolevel utils tcp srfi-4 \
        $(POSIXFILE) internal irregex scheduler debugger-client \
-       profiler stub expand modules chicken-syntax chicken-ffi-syntax build-version
+       profiler stub expand modules chicken-syntax chicken-ffi-syntax
 LIBCHICKEN_OBJECTS_1 = $(LIBCHICKEN_SCHEME_OBJECTS_1) runtime
 LIBCHICKEN_SHARED_OBJECTS = $(LIBCHICKEN_OBJECTS_1:=$(O))
 LIBCHICKEN_STATIC_OBJECTS = $(LIBCHICKEN_OBJECTS_1:=-static$(O))
@@ -703,7 +703,8 @@ endef
 
 bootstrap-lib = $(CHICKEN) $(call profile-flags, $@) $< $(CHICKEN_LIBRARY_OPTIONS) -output-file $@
 
-library.c: $(SRCDIR)library.scm $(SRCDIR)banner.scm $(SRCDIR)common-declarations.scm
+library.c: $(SRCDIR)library.scm $(SRCDIR)banner.scm $(SRCDIR)common-declarations.scm \
+	   $(SRCDIR)build-version.scm $(SRCDIR)buildversion buildbranch buildid buildtag.h
 	$(bootstrap-lib)
 internal.c: $(SRCDIR)internal.scm $(SRCDIR)mini-srfi-1.scm
 	$(bootstrap-lib) -emit-import-library chicken.internal
@@ -746,9 +747,6 @@ profiler.c: $(SRCDIR)profiler.scm $(SRCDIR)common-declarations.scm
 stub.c: $(SRCDIR)stub.scm $(SRCDIR)common-declarations.scm
 	$(bootstrap-lib) 
 debugger-client.c: $(SRCDIR)debugger-client.scm $(SRCDIR)common-declarations.scm dbg-stub.c
-	$(bootstrap-lib)
-build-version.c: $(SRCDIR)build-version.scm buildbranch buildid \
-	  $(SRCDIR)buildversion buildtag.h
 	$(bootstrap-lib)
 
 define declare-bootstrap-import-lib
