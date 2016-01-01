@@ -1,6 +1,6 @@
-;;;; build-version.scm
+;;;; units.scm - code loading
 ;
-; Copyright (c) 2011-2015, The CHICKEN Team
+; Copyright (c) 2015, The CHICKEN Team
 ; All rights reserved.
 ;
 ; Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -24,25 +24,10 @@
 ; POSSIBILITY OF SUCH DAMAGE.
 
 (declare
-  (unit build-version))
+  (unit units)
+  (disable-interrupts)
+  (fixnum))
 
-(foreign-declare "#include \"buildtag.h\"")
-
-;; (read-version filename): Read line from FILENAME and return
-;; as a string; return #f if non-existent file or blank line.
-(define-syntax read-version
-  (er-macro-transformer
-   (lambda (x r c)
-     (let ((fn (cadr x)))
-       (and (file-exists? fn)
-	    (call-with-input-file (cadr x)
-	     (lambda (p)
-	       (let ((ver ((##sys#slot (##sys#slot p 2) 8) p 256))) ; read-line
-		 (if (or (eof-object? ver) (string=? ver ""))
-		     #f
-		     ver)))))))))
-
-(define (##sys#build-tag)   (foreign-value "C_BUILD_TAG" c-string))
-(define ##sys#build-id      (read-version "buildid"))
-(define ##sys#build-branch  (read-version "buildbranch"))
-(define ##sys#build-version (read-version "buildversion"))
+(define ##sys#unit-hook
+  (lambda (id)
+    (##core#inline_allocate ("C_a_i_putprop" 8) id '##core#unit #t)))

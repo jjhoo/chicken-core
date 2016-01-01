@@ -12,10 +12,17 @@ library_options="-optimize-level 2 -include-path . -include-path ./ -inline -ign
 compiler="$1"
 shift
 
-for x in library eval data-structures ports files extras lolevel utils tcp srfi-4 posixunix posixwin irregex scheduler profiler stub expand modules chicken-syntax chicken-ffi-syntax build-version; do
+for x in \
+    library eval data-structures ports files extras lolevel utils \
+    tcp srfi-4 posixunix posixwin irregex scheduler profiler stub expand \
+    modules chicken-syntax chicken-ffi-syntax build-version units
+do
     $compiler $x.scm $library_options -output-file /tmp/xxx.c "$@"
 done
 
-for x in chicken batch-driver compiler optimizer lfa2 compiler-syntax scrutinizer support c-platform c-backend; do
+for x in \
+    chicken batch-driver compiler optimizer lfa2 compiler-syntax \
+    scrutinizer support c-platform c-backend
+do
     $compiler $x.scm $compiler_options -output-file /tmp/xxx.c "$@"
 done

@@ -41,6 +41,7 @@ stub.c
 support.c
 chicken.compiler.support.import.scm
 tcp.c
+units.c
 utils.c
 feathers.in
 feathers.bat.in
@@ -94,6 +95,7 @@ srfi-4.scm
 stub.scm
 support.scm
 tcp.scm
+units.scm
 build-version.scm
 build-version.c
 buildid

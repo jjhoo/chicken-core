@@ -417,35 +417,34 @@ Let's take a simple example.
 
   % csc -t hello.scm -optimize-level 3 -output-file hello.c
 
-Compiled to C, we get {{hello.c}}. We need the files {{chicken.h}},
-{{chicken-config.h}}, {{build-version.c}}, {{buildtag.h}} and
-{{runtime.c}}, which contain the basic runtime system, plus the five
-basic library files {{library.c}}, {{eval.c}}, {{expand.c}},
-{{modules.c}} and {{build-version.c}} which contain the same
-functionality as the library linked into a plain CHICKEN-compiled
-application, or which is available by default in the interpreter,
-{{csi}}:
-
+Compiled to C, we get {{hello.c}}. We need the files {{chicken-config.h}},
+{{chicken.h}}, {{buildtag.h}} and {{runtime.c}}, which contain the basic runtime
+system, plus the library files {{library.c}}, {{internal.c}}, {{eval.c}},
+{{expand.c}}, {{units.c}}, {{modules.c}} and {{build-version.c}}, which contain
+the same functionality as the library linked into a plain CHICKEN-compiled
+application, or which is available by default in the interpreter, {{csi}}:
 
   % cd /tmp
   % echo '(print "Hello World.")' > hello.scm
   % cp $CHICKEN_BUILD/runtime.c  .
   % cp $CHICKEN_BUILD/library.c  .
+  % cp $CHICKEN_BUILD/internal.c .
   % cp $CHICKEN_BUILD/eval.c     .
   % cp $CHICKEN_BUILD/extras.c   .
   % cp $CHICKEN_BUILD/expand.c   .
+  % cp $CHICKEN_BUILD/units.c    .
   % cp $CHICKEN_BUILD/modules.c  .
   % cp $CHICKEN_BUILD/build-version.c  .
   % cp $CHICKEN_BUILD/chicken.h  .
   % cp $CHICKEN_BUILD/chicken-config.h  .
   % cp $CHICKEN_BUILD/buildtag.h  .
   % gcc -static -Os -fomit-frame-pointer -DHAVE_CHICKEN_CONFIG_H runtime.c build-version.c \
-     library.c eval.c expand.c modules.c hello.c -o hello -lm
+     library.c eval.c expand.c units.c modules.c hello.c -o hello -lm
 
 Now we have all files together, and can create an tarball containing all the files:
 
- % tar cf hello.tar hello.c runtime.c build-version.c library.c eval.c extras.c \
-   expand.c modules.c chicken.h chicken-config.h
+ % tar cf hello.tar hello.c runtime.c build-version.c library.c internal.c \
+   eval.c extras.c expand.c units.c modules.c chicken.h chicken-config.h
  % gzip hello.tar
 
 This is naturally rather simplistic. Things like enabling dynamic
