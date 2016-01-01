@@ -684,6 +684,10 @@
 		     (else
 		      (import-name (chicken.expand#strip-syntax spec))))))))
     (##sys#check-syntax loc x '(_ . #(_ 1)))
+    ;; XXX This allows bootstrapping with older chickens.
+    ;; Should be removed after a checkpoint release of chicken-5.
+    (when (or (feature? #:chicken-bootstrap) (feature? #:chicken-4))
+      (set! load? #f))
     (let ((cm (##sys#current-module)))
       `(##core#begin
 	.
