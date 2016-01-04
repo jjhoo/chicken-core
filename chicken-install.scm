@@ -700,7 +700,7 @@
 		 (print-error-message 
 		  ex (current-error-port) 
 		  (sprintf "Failed to import from `~a'" f))
-	       (eval `(import ,(string->symbol (irregex-match-substring m 1)))))))
+	       (eval `(import-syntax ,(string->symbol (irregex-match-substring m 1)))))))
          files))
       (print "generating database")
       (let ((db
