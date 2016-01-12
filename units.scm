@@ -28,6 +28,10 @@
   (disable-interrupts)
   (fixnum))
 
-(define ##sys#unit-hook
+(define ##sys#provide
   (lambda (id)
-    (##core#inline_allocate ("C_a_i_putprop" 8) id '##core#unit #t)))
+    (##core#inline_allocate ("C_a_i_putprop" 8) id '##core#provided #t)))
+
+(define ##sys#provided?
+  (lambda (id)
+    (##core#inline "C_i_getprop" id '##core#provided #f)))
