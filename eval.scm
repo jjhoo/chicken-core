@@ -1280,26 +1280,25 @@
 ;;   - a fixed-up library id if the library was found, #f otherwise
 ;;   - a requirement type (e.g. 'dynamic) or #f if provided statically
 ;;
-;; FIXME - use the #:compiling feature in lieu of `comp?`
-;;
-(define (##sys#expand-require lib #!optional comp? (static-units '()))
-  (let ((id (library-id lib)))
+(define (##sys#expand-require lib #!optional (static-units '()))
+  (let ((id (library-id lib))
+	(compiling? (feature? #:compiling)))
     (cond
       ((assq id core-chicken-modules) =>
        (lambda (mod)
-	 (##sys#expand-require (cdr mod) comp? static-units)))
+	 (##sys#expand-require (cdr mod) static-units)))
       ((or (memq id builtin-features)
-	   (and comp? (memq id builtin-features/compiled)))
+	   (and compiling? (memq id builtin-features/compiled)))
        (values '(##core#undefined) id #f))
       ((memq id static-units)
        (values '(##core#undefined) id #f))
-      ((and (not comp?) (##sys#feature? id))
+      ((and (not compiling?) (##sys#feature? id))
        (values '(##core#undefined) id #f))
       ((memq id core-syntax-units)
        (values '(##core#undefined) id #f))
       ((memq id core-library-units)
        (values
-	(if comp?
+	(if compiling?
 	    `(##core#declare (uses ,id))
 	    `(##sys#load-library (##core#quote ,id) #f))
 	id #f))

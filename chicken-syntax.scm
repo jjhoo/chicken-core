@@ -259,7 +259,7 @@
 		    ((compare s 'compile) (set! c #t))
 		    (else (##sys#error "invalid situation specifier" (car ss))))
 	      (loop (cdr ss)))))
-      (if (memq '#:compiling ##sys#features)
+      (if (memq #:compiling ##sys#features)
 	  (cond ((and c l) `(##core#compiletimetoo ,body))
 		(c `(##core#compiletimeonly ,body))
 		(l body)

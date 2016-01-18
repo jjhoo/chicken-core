@@ -443,7 +443,7 @@
        (lambda (f) (load (##sys#resolve-include-filename f #f #t))) 
        extends) )
     (set! ##sys#features (delete #:compiler-extension ##sys#features))
-    (set! ##sys#features (cons '#:compiling ##sys#features))
+    (set! ##sys#features (cons #:compiling ##sys#features))
     (set! upap (user-post-analysis-pass))
 
     ;; Append required extensions to initforms:

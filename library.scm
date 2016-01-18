@@ -241,7 +241,7 @@ EOF
   (when (or (not (##core#inline "C_blockp" x)) 
 	    (and (##core#inline "C_specialp" x) (fx= i 0))
 	    (##core#inline "C_byteblockp" x) ) 
-    (##sys#signal-hook '#:type-error '##sys#block-set! "slot not accessible" x) )
+    (##sys#signal-hook #:type-error '##sys#block-set! "slot not accessible" x) )
   (##sys#check-range i 0 (##sys#size x) '##sys#block-set!)
   (##sys#setslot x i y) )
 

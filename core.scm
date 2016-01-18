@@ -675,7 +675,7 @@
 				'(##core#undefined)
 				(let ((id (car ids)))
 				  (let-values (((exp lib type)
-						(##sys#expand-require id #t used-units)))
+						(##sys#expand-require id used-units)))
 				    (unless (not type)
 				      (##sys#hash-table-update!
 				       file-requirements
