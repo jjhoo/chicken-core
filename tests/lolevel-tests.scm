@@ -1,6 +1,6 @@
 ;;;; Unit lolevel testing
 
-(require-extension lolevel)
+(require-extension locative lolevel)
 
 (define-syntax assert-error
   (syntax-rules ()
