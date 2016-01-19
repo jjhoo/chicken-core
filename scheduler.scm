@@ -31,8 +31,8 @@
   (disable-interrupts)
   (hide ready-queue-head ready-queue-tail ##sys#timeout-list
 	##sys#update-thread-state-buffer ##sys#restore-thread-state-buffer
-	remove-from-ready-queue ##sys#unblock-threads-for-i/o ##sys#force-primordial
-	fdset-set fdset-test create-fdset stderr delq
+	##sys#unblock-threads-for-i/o ##sys#force-primordial
+	remove-from-ready-queue fdset-test create-fdset stderr delq
 	##sys#clear-i/o-state-for-thread! ##sys#abandon-mutexes) 
   (not inline ##sys#interrupt-hook)
   (unsafe)
