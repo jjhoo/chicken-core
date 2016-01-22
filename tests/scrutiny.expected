@@ -27,7 +27,7 @@ Warning: at toplevel:
   (scrutiny-tests.scm:21) in procedure call to `string?', expected 1 argument, but was given 0 arguments
 
 Warning: at toplevel:
-  expected in argument #1 of procedure call `(print (cpu-time))' a single result, but were given 2 results
+  expected in argument #1 of procedure call `(print (values 1 2))' a single result, but were given 2 results
 
 Warning: at toplevel:
   expected in argument #1 of procedure call `(print (values))' a single result, but were given zero results
