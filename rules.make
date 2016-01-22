@@ -523,6 +523,7 @@ $(eval $(call declare-emitted-import-lib-dependency,chicken.flonum,library))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.gc,library))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.keyword,library))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.time,library))
+$(eval $(call declare-emitted-import-lib-dependency,chicken.load,eval))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.format,extras))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.io,extras))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.pretty-print,extras))
@@ -547,6 +548,7 @@ batch-driver.c: batch-driver.scm mini-srfi-1.scm \
 		chicken.files.import.scm \
 		chicken.format.import.scm \
 		chicken.gc.import.scm \
+		chicken.load.import.scm \
 		chicken.pretty-print.import.scm \
 		chicken.time.import.scm
 c-platform.c: c-platform.scm mini-srfi-1.scm \
@@ -660,6 +662,7 @@ chicken-install.c: chicken-install.scm \
 		chicken.format.import.scm \
 		chicken.io.import.scm \
 		chicken.irregex.import.scm \
+		chicken.load.import.scm \
 		chicken.ports.import.scm \
 		chicken.posix.import.scm \
 		chicken.pretty-print.import.scm \
@@ -671,6 +674,7 @@ chicken-uninstall.c: chicken-uninstall.scm \
 		chicken.foreign.import.scm \
 		chicken.format.import.scm \
 		chicken.irregex.import.scm \
+		chicken.load.import.scm \
 		chicken.ports.import.scm \
 		chicken.posix.import.scm \
 		setup-api.import.scm
@@ -681,6 +685,7 @@ setup-api.c: setup-api.scm \
 		chicken.format.import.scm \
 		chicken.io.import.scm \
 		chicken.irregex.import.scm \
+		chicken.load.import.scm \
 		chicken.posix.import.scm \
 		chicken.pretty-print.import.scm \
 		chicken.utils.import.scm
@@ -727,7 +732,7 @@ eval.c: eval.scm \
 		chicken.internal.import.scm \
 		chicken.keyword.import.scm
 repl.c: repl.scm \
-		chicken.eval.import.scm
+		chicken.load.import.scm
 files.c: files.scm \
 		chicken.data-structures.import.scm \
 		chicken.io.import.scm \
@@ -764,7 +769,9 @@ library.c: $(SRCDIR)library.scm $(SRCDIR)banner.scm $(SRCDIR)common-declarations
 internal.c: $(SRCDIR)internal.scm $(SRCDIR)mini-srfi-1.scm
 	$(bootstrap-lib) -emit-import-library chicken.internal
 eval.c: $(SRCDIR)eval.scm $(SRCDIR)common-declarations.scm $(SRCDIR)mini-srfi-1.scm
-	$(bootstrap-lib) -emit-import-library chicken.eval
+	$(bootstrap-lib) \
+	-emit-import-library chicken.eval \
+	-emit-import-library chicken.load
 read-syntax.c: $(SRCDIR)read-syntax.scm $(SRCDIR)common-declarations.scm
 	$(bootstrap-lib) -emit-import-library chicken.read-syntax
 repl.c: $(SRCDIR)repl.scm $(SRCDIR)common-declarations.scm

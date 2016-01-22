@@ -5,6 +5,7 @@
  (compiling
   (include "test.scm") )
  (else
+  (import load)
   (load-relative "test.scm")))
 
 (test-begin "modules")

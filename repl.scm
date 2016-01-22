@@ -34,7 +34,7 @@
 
 (import scheme
 	chicken
-	chicken.eval
+	chicken.load
 	chicken.foreign)
 
 (include "common-declarations.scm")

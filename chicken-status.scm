@@ -32,6 +32,7 @@
 	  chicken.foreign
 	  chicken.format
 	  chicken.irregex
+	  chicken.load
 	  chicken.ports
 	  chicken.posix
 	  chicken.pretty-print)

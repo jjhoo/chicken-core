@@ -59,6 +59,7 @@ EOF
 	chicken.gc
 	chicken.keyword
 	chicken.io
+	chicken.load
 	chicken.ports
 	chicken.pretty-print
 	chicken.repl)

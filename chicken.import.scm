@@ -39,7 +39,6 @@
    call/cc
    case-sensitive
    char-name
-   (chicken-home . chicken.eval#chicken-home)
    chicken-version
    command-line-arguments
    condition-predicate
@@ -52,20 +51,17 @@
    current-read-table
    delete-file
    directory-exists?
-   (dynamic-load-libraries . chicken.eval#dynamic-load-libraries)
    enable-warnings
    equal=?
    (er-macro-transformer . chicken.expand#er-macro-transformer)
    errno
    error
-   (eval-handler . chicken.eval#eval-handler)
    exact-integer?
    exact-integer-sqrt
    exact-integer-nth-root
    exit
    exit-handler
    (expand . chicken.expand#expand)
-   (extension-information . chicken.eval#extension-information)
    feature?
    features
    file-exists?
@@ -116,10 +112,6 @@
    infinite?
    (ir-macro-transformer . chicken.expand#ir-macro-transformer)
    keyword-style
-   (load-library . chicken.eval#load-library)
-   (load-noisily . chicken.eval#load-noisily)
-   (load-relative . chicken.eval#load-relative)
-   (load-verbose . chicken.eval#load-verbose)
    machine-byte-order
    machine-type
    make-blob
@@ -154,8 +146,6 @@
    register-feature!
    remprop!
    rename-file
-   (repository-path . chicken.eval#repository-path)
-   (require . chicken.eval#require)
    reset
    reset-handler
    return-to-host

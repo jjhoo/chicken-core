@@ -45,6 +45,7 @@
 	chicken.files
 	chicken.format
 	chicken.gc
+	chicken.load
 	chicken.pretty-print
 	chicken.time
 	chicken.compiler.support

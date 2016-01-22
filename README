@@ -296,6 +296,7 @@
 	|   |       |-- chicken.format.import.so
 	|   |       |-- chicken.gc.import.so
 	|   |       |-- chicken.locative.import.so
+	|   |       |-- chicken.load.import.so
 	|   |       |-- chicken.lolevel.import.so
 	|   |       |-- chicken.internal.import.so
 	|   |       |-- chicken.io.import.so

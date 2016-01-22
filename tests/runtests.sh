@@ -42,6 +42,8 @@ for x in \
     chicken.bitwise.import.so \
     chicken.continuation.import.so \
     chicken.data-structures.import.so \
+    chicken.eval.import.so \
+    chicken.expand.import.so \
     chicken.files.import.so \
     chicken.flonum.import.so \
     chicken.foreign.import.so \
@@ -51,6 +53,7 @@ for x in \
     chicken.io.import.so \
     chicken.irregex.import.so \
     chicken.keyword.import.so \
+    chicken.load.import.so \
     chicken.locative.import.so \
     chicken.lolevel.import.so \
     chicken.ports.import.so \

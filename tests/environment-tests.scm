@@ -1,5 +1,6 @@
 ;;;; environment-tests.scm
 
+(import load)
 
 (load-relative "test.scm")
 

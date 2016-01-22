@@ -569,7 +569,7 @@
 				 (##sys#macro-environment
 				  (##sys#meta-macro-environment)))
 		    (fluid-let ((##sys#notices-enabled #f)) ; to avoid re-import warnings
-		      (chicken.eval#load il)))
+		      (chicken.load#load il)))
 		  (set! mod (##sys#find-module mname 'import)))
 	      (else
 	       (##sys#syntax-error-hook
@@ -909,7 +909,7 @@
 	     call-with-current-continuation input-port? output-port?
 	     current-input-port current-output-port call-with-input-file
 	     call-with-output-file open-input-file open-output-file
-	     close-input-port close-output-port (load . chicken.eval#load)
+	     close-input-port close-output-port (load . chicken.load#load)
 	     read read-char peek-char write display write-char newline eof-object?
 	     with-input-from-file with-output-to-file (eval . chicken.eval#eval)
 	     char-ready? imag-part real-part make-rectangular make-polar angle
@@ -948,6 +948,7 @@
 (##sys#register-module-alias 'irregex 'chicken.irregex)
 (##sys#register-module-alias 'keyword 'chicken.keyword)
 (##sys#register-module-alias 'locative 'chicken.locative)
+(##sys#register-module-alias 'load 'chicken.load)
 (##sys#register-module-alias 'lolevel 'chicken.lolevel)
 (##sys#register-module-alias 'ports 'chicken.ports)
 (##sys#register-module-alias 'posix 'chicken.posix)

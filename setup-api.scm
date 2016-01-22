@@ -70,6 +70,7 @@
 	  chicken.format
 	  chicken.io
 	  chicken.irregex
+	  chicken.load
 	  chicken.posix
 	  chicken.pretty-print
 	  chicken.utils)

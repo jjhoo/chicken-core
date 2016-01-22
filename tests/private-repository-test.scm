@@ -1,7 +1,6 @@
 ;;;; private-repository-test.scm
 
-
-(use files posix)
+(use files load posix)
 
 (define read-symbolic-link*
   (cond-expand

@@ -46,111 +46,24 @@
 #define C_rnd_fix()		(C_fix(rand()))
 <#
 
+(include "common-declarations.scm")
+
 (module chicken.eval
-  (chicken-home dynamic-load-libraries
-   eval eval-handler extension-information
-   load load-library load-noisily load-relative load-verbose
-   interaction-environment null-environment scheme-report-environment
-   require repository-path set-dynamic-load-mode!)
+  (eval eval-handler
+   interaction-environment
+   null-environment
+   scheme-report-environment)
 
 ;; Exclude values defined within this module.
-(import (except scheme eval load interaction-environment null-environment scheme-report-environment))
-(import chicken)
+(import (except scheme eval interaction-environment null-environment scheme-report-environment))
 
-(import chicken.internal
+(import chicken
 	chicken.expand
-	chicken.keyword
-	chicken.foreign)
+	chicken.keyword)
 
-(include "common-declarations.scm")
 (include "mini-srfi-1.scm")
 
 (define-syntax d (syntax-rules () ((_ . _) (void))))
-
-(define-foreign-variable install-egg-home c-string "C_INSTALL_EGG_HOME")
-(define-foreign-variable installation-home c-string "C_INSTALL_SHARE_HOME")
-(define-foreign-variable binary-version int "C_BINARY_VERSION")
-(define-foreign-variable uses-soname? bool "C_USES_SONAME")
-(define-foreign-variable install-lib-name c-string "C_INSTALL_LIB_NAME")
-
-;; TODO take these mappings from import files instead
-(define-constant core-chicken-modules
-  '((chicken . chicken-syntax)
-    (chicken.bitwise . library)
-    (chicken.continuation . continuation)
-    (chicken.data-structures . data-structures)
-    (chicken.eval . eval)
-    (chicken.expand . expand)
-    (chicken.files . files)
-    (chicken.flonum . library)
-    (chicken.foreign . chicken-ffi-syntax)
-    (chicken.format . extras)
-    (chicken.gc . library)
-    (chicken.internal . internal)
-    (chicken.io . extras)
-    (chicken.irregex . irregex)
-    (chicken.keyword . library)
-    (chicken.locative . lolevel)
-    (chicken.lolevel . lolevel)
-    (chicken.ports . ports)
-    (chicken.posix . posix)
-    (chicken.pretty-print . extras)
-    (chicken.tcp . tcp)
-    (chicken.time . library)
-    (chicken.repl . repl)
-    (chicken.read-syntax . read-syntax)
-    (chicken.utils . utils)))
-
-(define-constant core-library-units
-  `(srfi-4 . ,(map cdr core-chicken-modules)))
-
-(define-constant core-syntax-units
-  '(chicken-syntax chicken-ffi-syntax))
-
-(define-constant cygwin-default-dynamic-load-libraries '("cygchicken-0"))
-(define-constant macosx-load-library-extension ".dylib")
-(define-constant windows-load-library-extension ".dll")
-(define-constant hppa-load-library-extension ".sl")
-(define-constant default-load-library-extension ".so")
-(define-constant environment-table-size 301)
-(define-constant source-file-extension ".scm")
-(define-constant setup-file-extension "setup-info")
-(define-constant repository-environment-variable "CHICKEN_REPOSITORY")
-(define-constant prefix-environment-variable "CHICKEN_PREFIX")
-
-; these are actually in unit extras, but that is used by default
-; srfi-12 in unit library
-; srfi-98 partially in unit posix
-
-(define-constant builtin-features
-  '(scheme chicken
-    srfi-2 srfi-6 srfi-10 srfi-12
-    srfi-23 srfi-28 srfi-30 srfi-39
-    srfi-55 srfi-88 srfi-98))
-
-(define-constant builtin-features/compiled
-  '(srfi-8 srfi-9 srfi-11 srfi-15 srfi-16 srfi-17 srfi-26) )
-
-(define default-dynamic-load-libraries
-  (case (build-platform)
-    ((cygwin) cygwin-default-dynamic-load-libraries)
-    (else `(,(string-append "lib" install-lib-name)))))
-
-(define chicken-prefix
-  (let ((prefix (and-let* ((p (get-environment-variable prefix-environment-variable)))
-		  (##sys#string-append 
-		   p
-		   (if (memq (string-ref p (fx- (##sys#size p) 1)) '(#\\ #\/)) "" "/")) ) ) )
-    (lambda (#!optional dir)
-      (and prefix
-	   (if dir (##sys#string-append prefix dir) prefix) ) ) ) )
-	  
-
-;;; System settings
-
-(define (chicken-home)
-  (or (chicken-prefix "share/chicken") installation-home))
-
 
 ;;; Lo-level hashtable support:
 
@@ -713,15 +626,19 @@
 			  (compile `(,(rename 'lambda se) ,@(cdr x)) e #f tf cntr se) ]
 
 			 [(##core#require-for-syntax)
-			  (let ([ids (map (lambda (x) (##sys#eval/meta x))
-					  (cdr x))])
-			    (apply ##sys#require ids)
-			    (let ((rs (lookup-runtime-requirements ids)))
-			      (compile
-			       (if (null? rs)
-				   '(##core#undefined)
-				   `(##sys#require ,@(map (lambda (x) `(##core#quote ,x)) rs)) )
-			       e #f tf cntr se) ) ) ]
+			  (if (##sys#symbol-has-toplevel-binding? 'chicken.load#load)
+			      (let ((ids (map (lambda (x) (##sys#eval/meta x)) (cdr x))))
+				(apply ##sys#require ids)
+				(let ((rs (##sys#lookup-runtime-requirements ids)))
+				  (compile
+				   (if (null? rs)
+				       '(##core#undefined)
+				       `(##sys#require ,@(map (lambda (x) `(##core#quote ,x)) rs)))
+				   e #f tf cntr se)))
+			      (##sys#syntax-error-hook
+			       'require-for-syntax
+			       "cannot load extension for syntax -\
+			        the `load' library must be imported" x))]
 
 			 [(##core#require)
 			  (compile
@@ -891,6 +808,72 @@
   (apply (eval-handler) x env))
 
 
+;;; Environments:
+
+(define interaction-environment
+  (let ((e (##sys#make-structure 'environment 'interaction-environment #f #f)))
+    (lambda () e)))
+
+(define-record-printer (environment e p)
+  (##sys#print "#<environment " #f p)
+  (##sys#print (##sys#slot e 1) #f p)
+  (##sys#write-char-0 #\> p))
+
+(define scheme-report-environment)
+(define null-environment)
+
+(let* ((r4s (module-environment 'r4rs 'scheme-report-environment/4))
+       (r5s (module-environment 'scheme 'scheme-report-environment/5))
+       (r4n (module-environment 'r4rs-null 'null-environment/4))
+       (r5n (module-environment 'r5rs-null 'null-environment/5)))
+  (define (strip se)
+    (foldr
+     (lambda (s r)
+       (if (memq (car s)
+		 '(import
+		   import-syntax
+		   import-for-syntax
+		   import-syntax-for-syntax
+		   require-extension
+		   require-extension-for-syntax
+		   require-library
+		   begin-for-syntax
+		   export
+		   module
+		   cond-expand
+		   syntax
+		   reexport))
+	   r
+	   (cons s r)))
+     '()
+     se))
+  ;; Strip non-std syntax from SEs
+  (##sys#setslot r4s 2 (strip (##sys#slot r4s 2)))
+  (##sys#setslot r4n 2 (strip (##sys#slot r4n 2)))
+  (##sys#setslot r5s 2 (strip (##sys#slot r5s 2)))
+  (##sys#setslot r5n 2 (strip (##sys#slot r5n 2)))
+  (set! scheme-report-environment
+    (lambda (n)
+      (##sys#check-fixnum n 'scheme-report-environment)
+      (case n
+	((4) r4s)
+	((5) r5s)
+	(else
+	 (##sys#error
+	  'scheme-report-environment
+	  "unsupported scheme report environment version" n)) ) ) )
+  (set! null-environment
+    (lambda (n)
+      (##sys#check-fixnum n 'null-environment)
+      (case n
+	((4) r4n)
+	((5) r5n)
+	(else
+	 (##sys#error
+	  'null-environment
+	  "unsupported null environment version" n))))))
+
+
 ;;; Setting properties dynamically scoped
 
 (define-values (##sys#put/restore! ##sys#with-property-restore)
@@ -935,6 +918,105 @@
 	      [else (loop (##sys#slot llist 1)
 			  (cons (##sys#slot llist 0) vars)
 			  (fx+ argc 1) ) ] ) ) ) ) )
+
+) ; eval module
+
+
+(module chicken.load
+  (load load-library load-noisily load-relative load-verbose
+   extension-information chicken-home dynamic-load-libraries
+   require repository-path set-dynamic-load-mode!)
+
+(import (except scheme load))
+
+(import chicken
+	chicken.eval
+	chicken.foreign
+	chicken.internal)
+
+(define-foreign-variable install-egg-home c-string "C_INSTALL_EGG_HOME")
+(define-foreign-variable installation-home c-string "C_INSTALL_SHARE_HOME")
+(define-foreign-variable binary-version int "C_BINARY_VERSION")
+(define-foreign-variable uses-soname? bool "C_USES_SONAME")
+(define-foreign-variable install-lib-name c-string "C_INSTALL_LIB_NAME")
+
+;; TODO take these mappings from import files instead
+(define-constant core-chicken-modules
+  '((chicken . chicken-syntax)
+    (chicken.bitwise . library)
+    (chicken.continuation . continuation)
+    (chicken.data-structures . data-structures)
+    (chicken.eval . eval)
+    (chicken.expand . expand)
+    (chicken.files . files)
+    (chicken.flonum . library)
+    (chicken.foreign . chicken-ffi-syntax)
+    (chicken.format . extras)
+    (chicken.gc . library)
+    (chicken.internal . internal)
+    (chicken.io . extras)
+    (chicken.irregex . irregex)
+    (chicken.keyword . library)
+    (chicken.locative . lolevel)
+    (chicken.load . eval)
+    (chicken.lolevel . lolevel)
+    (chicken.ports . ports)
+    (chicken.posix . posix)
+    (chicken.pretty-print . extras)
+    (chicken.tcp . tcp)
+    (chicken.time . library)
+    (chicken.repl . repl)
+    (chicken.read-syntax . read-syntax)
+    (chicken.utils . utils)))
+
+(define-constant core-library-units
+  `(srfi-4 . ,(map cdr core-chicken-modules)))
+
+(define-constant core-syntax-units
+  '(chicken-syntax chicken-ffi-syntax))
+
+(define-constant cygwin-default-dynamic-load-libraries '("cygchicken-0"))
+(define-constant macosx-load-library-extension ".dylib")
+(define-constant windows-load-library-extension ".dll")
+(define-constant hppa-load-library-extension ".sl")
+(define-constant default-load-library-extension ".so")
+(define-constant environment-table-size 301)
+(define-constant source-file-extension ".scm")
+(define-constant setup-file-extension "setup-info")
+(define-constant repository-environment-variable "CHICKEN_REPOSITORY")
+(define-constant prefix-environment-variable "CHICKEN_PREFIX")
+
+; these are actually in unit extras, but that is used by default
+; srfi-12 in unit library
+; srfi-98 partially in unit posix
+
+(define-constant builtin-features
+  '(scheme chicken
+    srfi-2 srfi-6 srfi-10 srfi-12
+    srfi-23 srfi-28 srfi-30 srfi-39
+    srfi-55 srfi-88 srfi-98))
+
+(define-constant builtin-features/compiled
+  '(srfi-8 srfi-9 srfi-11 srfi-15 srfi-16 srfi-17 srfi-26) )
+
+(define default-dynamic-load-libraries
+  (case (build-platform)
+    ((cygwin) cygwin-default-dynamic-load-libraries)
+    (else `(,(string-append "lib" install-lib-name)))))
+
+(define chicken-prefix
+  (let ((prefix (and-let* ((p (get-environment-variable prefix-environment-variable)))
+		  (##sys#string-append
+		   p
+		   (if (memq (string-ref p (fx- (##sys#size p) 1)) '(#\\ #\/)) "" "/")) ) ) )
+    (lambda (#!optional dir)
+      (and prefix
+	   (if dir (##sys#string-append prefix dir) prefix) ) ) ) )
+
+;;; System settings
+
+(define (chicken-home)
+  (or (chicken-prefix "share/chicken") installation-home))
 
 
 ;;; Loading source/object files:
@@ -1153,7 +1235,7 @@
 	    (fluid-let ((##sys#current-source-filename path))
 	      (do ((x (read) (read))
 		   (xs '() (cons x xs)) )
-		  ((eof-object? x) 
+		  ((eof-object? x)
 		   (reverse xs))) ) ) ) ) ) ) )
 
 
@@ -1166,11 +1248,11 @@
       (define (sep? c) (or (char=? #\\ c) (char=? #\/ c)))
       (let ([p (cond [(string? id) id]
 		     [(symbol? id) (##sys#symbol->string id)]
-		     [(list? id) 
+		     [(list? id)
 		      (let loop ([id id])
 			(if (null? id)
 			    ""
-			    (string-append 
+			    (string-append
 			     (let ([id0 (##sys#slot id 0)])
 			       (cond [(symbol? id0) (##sys#symbol->string id0)]
 				     [(string? id0) id0]
@@ -1194,7 +1276,7 @@
 	     (foreign-value "C_private_repository_path()" c-string)
 	     (or (get-environment-variable repository-environment-variable)
 		 (chicken-prefix
-		  (##sys#string-append 
+		  (##sys#string-append
 		   "lib/chicken/"
 		   (##sys#number->string (##sys#fudge 42))) )
 		 install-egg-home))))
@@ -1269,7 +1351,9 @@
 (define (extension-information ext)
   (extension-information/internal ext 'extension-information))
 
-(define lookup-runtime-requirements
+;; FIXME This is qualified for visibility in the eval module until
+;; module-namespaced identifiers are allowed to be unbound.
+(define ##sys#lookup-runtime-requirements
   (let ([with-input-from-file with-input-from-file]
 	[read read] )
     (lambda (ids)
@@ -1332,76 +1416,9 @@
       (else
        (values `(##sys#require (##core#quote ,id)) #f 'dynamic)))))
 
-
-;;; Environments:
-
-(define interaction-environment
-  (let ((e (##sys#make-structure 'environment 'interaction-environment #f #f)))
-    (lambda () e)))
-
-(define-record-printer (environment e p)
-  (##sys#print "#<environment " #f p)
-  (##sys#print (##sys#slot e 1) #f p)
-  (##sys#write-char-0 #\> p))
-
-(define scheme-report-environment)
-(define null-environment)
-
-(let* ((r4s (module-environment 'r4rs 'scheme-report-environment/4))
-       (r5s (module-environment 'scheme 'scheme-report-environment/5))
-       (r4n (module-environment 'r4rs-null 'null-environment/4))
-       (r5n (module-environment 'r5rs-null 'null-environment/5)))
-  (define (strip se)
-    (foldr
-     (lambda (s r)
-       (if (memq (car s)
-		 '(import
-		   import-syntax
-		   import-for-syntax
-		   import-syntax-for-syntax
-		   require-extension
-		   require-extension-for-syntax
-		   require-library
-		   begin-for-syntax
-		   export
-		   module
-		   cond-expand
-		   syntax
-		   reexport))
-	   r
-	   (cons s r)))
-     '()
-     se))
-  ;; Strip non-std syntax from SEs
-  (##sys#setslot r4s 2 (strip (##sys#slot r4s 2)))
-  (##sys#setslot r4n 2 (strip (##sys#slot r4n 2)))
-  (##sys#setslot r5s 2 (strip (##sys#slot r5s 2)))
-  (##sys#setslot r5n 2 (strip (##sys#slot r5n 2)))
-  (set! scheme-report-environment
-    (lambda (n)
-      (##sys#check-fixnum n 'scheme-report-environment)
-      (case n
-	((4) r4s)
-	((5) r5s)
-	(else 
-	 (##sys#error 
-	  'scheme-report-environment
-	  "unsupported scheme report environment version" n)) ) ) )
-  (set! null-environment
-    (lambda (n)
-      (##sys#check-fixnum n 'null-environment)
-      (case n
-	((4) r4n)
-	((5) r5n)
-	(else
-	 (##sys#error
-	  'null-environment 
-	  "unsupported null environment version" n) )))))
-
-
 ;;; Find included file:
 
-(define ##sys#include-pathnames 
+(define ##sys#include-pathnames
   (let ((h (chicken-home)))
     (if h (list h) '())) )
 
@@ -1418,15 +1435,15 @@
 		  fn
 		  (test2 fname (cdr lst)) ) ) ) )
       (define (test fname)
-	(test2 
+	(test2
 	 fname
 	 (cond ((not (##sys#fudge 24)) (list source-file-extension)) ; no dload?
 	       (prefer-source (list source-file-extension ##sys#load-dynamic-extension))
 	       (else (list ##sys#load-dynamic-extension source-file-extension) ) ) ))
       (or (test fname)
 	  (let loop ((paths (if repo
-				(##sys#append 
-				 ##sys#include-pathnames 
+				(##sys#append
+				 ##sys#include-pathnames
 				 (let ((rp (##sys#repository-path)))
 				   (if rp
 				       (list (##sys#repository-path))
@@ -1438,7 +1455,7 @@
 					fname) ) )
 		  (else (loop (##sys#slot paths 1))) ) ) ) ) ) )
 
-) ; eval module
+) ; load module
 
 ;;; Simple invocation API:
 
@@ -1534,7 +1551,7 @@
        (store-result (read i) result) ) ) ) )
 
 (define-external (CHICKEN_load (c-string str)) bool
-  (run-safe (lambda () (chicken.eval#load str) #t)))
+  (run-safe (lambda () (chicken.load#load str) #t)))
 
 (define-external (CHICKEN_get_error_message ((c-pointer "char") buf) (int bufsize)) void
   (store-string (or last-error "No error") bufsize buf) )
