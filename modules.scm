@@ -26,7 +26,7 @@
 
 (declare
   (unit modules)
-  (uses eval expand internal)
+  (uses expand internal)
   (disable-interrupts)
   (fixnum)
   (not inline ##sys#alias-global-hook)

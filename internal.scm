@@ -30,10 +30,12 @@
   (fixnum))
 
 (module chicken.internal
-  (library-id valid-library-specifier? string->c-identifier)
+  (library-id valid-library-specifier?
+   string->c-identifier last-error run-safe)
 
 (import scheme chicken)
 
+(include "common-declarations.scm")
 (include "mini-srfi-1.scm")
 
 
@@ -87,5 +89,19 @@
 	       (string-append str "." (library-part->string (car lst)))))
 	 ((null? lst)
 	  (##sys#intern-symbol str))))))
+
+
+;; Error handling for the C invocation API:
+
+(define last-error #f)
+
+(define (run-safe thunk)
+  (set! last-error #f)
+  (handle-exceptions ex
+    (let ((o (open-output-string)))
+      (print-error-message ex o)
+      (set! last-error (get-output-string o))
+      #f)
+    (thunk)))
 
 ) ; chicken.internal

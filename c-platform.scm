@@ -75,7 +75,7 @@
      (bound-to-procedure
        ##sys#profile-entry ##sys#profile-exit) ) ) )
 
-(define units-used-by-default '(library eval chicken-syntax))
+(define units-used-by-default '(library load chicken-syntax))
 (define words-per-flonum 4)
 
 (eq-inline-operator "C_eqp")

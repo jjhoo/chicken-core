@@ -60,7 +60,7 @@ the source text should be read from standard input.
 
 ; -emit-type-file FILENAME : Write type-information for declarations of user-defined and globally visible variables to a file of the given name. The generated file is suitable for use with the {{-consult-type-file}} option.
 
-; -explicit-use : Disables automatic use of the units {{library, eval}} and {{expand}}. Use this option if compiling a library unit instead of an application unit.
+; -explicit-use : Disables automatic use of the {{library}}, {{eval}}, {{load}} and {{expand}} units. Use this option if compiling a library unit instead of an application unit.
 
 ; -extend FILENAME : Loads a Scheme source file or compiled Scheme program (on systems that support it) before compilation commences. This feature can be used to extend the compiler.  This option may be given multiple times. The file is also searched in the current include path and in the extension-repository.
 
@@ -433,13 +433,14 @@ application, or which is available by default in the interpreter, {{csi}}:
   % cp $CHICKEN_BUILD/extras.c   .
   % cp $CHICKEN_BUILD/expand.c   .
   % cp $CHICKEN_BUILD/units.c    .
+  % cp $CHICKEN_BUILD/load.c     .
   % cp $CHICKEN_BUILD/modules.c  .
   % cp $CHICKEN_BUILD/build-version.c  .
   % cp $CHICKEN_BUILD/chicken.h  .
   % cp $CHICKEN_BUILD/chicken-config.h  .
   % cp $CHICKEN_BUILD/buildtag.h  .
   % gcc -static -Os -fomit-frame-pointer -DHAVE_CHICKEN_CONFIG_H runtime.c build-version.c \
-     library.c eval.c expand.c units.c modules.c hello.c -o hello -lm
+     library.c eval.c expand.c units.c load.c modules.c hello.c -o hello -lm
 
 Now we have all files together, and can create an tarball containing all the files:
 

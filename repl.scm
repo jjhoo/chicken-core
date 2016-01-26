@@ -26,7 +26,7 @@
 
 (declare
   (unit repl)
-  (uses eval)
+  (uses load)
   (not inline ##sys#repl-read-hook ##sys#repl-print-hook ##sys#read-prompt-hook))
 
 (module chicken.repl

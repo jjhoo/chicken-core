@@ -25,6 +25,7 @@ ports.c
 files.c
 extras.c
 library.c
+load.c
 lolevel.c
 optimizer.c
 chicken.compiler.optimizer.import.scm
@@ -369,6 +370,7 @@ manual-html/Unit expand.html
 manual-html/Unit extras.html
 manual-html/Unit files.html
 manual-html/Unit library.html
+manual-html/Unit load.html
 manual-html/Unit lolevel.html
 manual-html/Unit ports.html
 manual-html/Unit posix.html

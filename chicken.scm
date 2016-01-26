@@ -26,8 +26,8 @@
 
 
 (declare
-  (uses chicken-syntax chicken-ffi-syntax 
-	srfi-4 data-structures support
+  (uses chicken-syntax chicken-ffi-syntax
+	load srfi-4 data-structures support
 	compiler optimizer lfa2 compiler-syntax scrutinizer
 	;; TODO: These three need to be made configurable somehow
 	batch-driver c-platform c-backend))

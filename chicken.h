@@ -2185,8 +2185,7 @@ C_fctexport C_word C_fcall C_i_pending_interrupt(C_word dummy) C_regparm;
 C_fctexport void *C_get_statistics(void);
 
 /* defined in eval.scm: */
-C_fctexport  void  CHICKEN_get_error_message(char *buf,int bufsize);
-C_fctexport  int  CHICKEN_load(char * filename);
+C_fctexport  void CHICKEN_get_error_message(char *buf,int bufsize);
 C_fctexport  int  CHICKEN_read(char * str,C_word *result);
 C_fctexport  int  CHICKEN_apply_to_string(C_word func,C_word args,char *buf,int bufsize);
 C_fctexport  int  CHICKEN_apply(C_word func,C_word args,C_word *result);
@@ -2196,6 +2195,10 @@ C_fctexport  int  CHICKEN_eval_string(char * str,C_word *result);
 C_fctexport  int  CHICKEN_eval(C_word exp,C_word *result);
 C_fctexport  int  CHICKEN_yield();
 
+/* defined in load.scm: */
+C_fctexport  int  CHICKEN_load(char * filename);
+
+/* default toplevel from stub.scm: */
 C_fctexport C_cpsproc(C_default_5fstub_toplevel);
 
 
