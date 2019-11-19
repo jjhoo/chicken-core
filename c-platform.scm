@@ -968,8 +968,8 @@
 (rewrite 'chicken.memory#pointer-f32-set! 2 2 "C_u_i_pointer_f32_set" #f)
 (rewrite 'chicken.memory#pointer-f64-set! 2 2 "C_u_i_pointer_f64_set" #f)
 
-(rewrite 'chicken.memory#pointer-u32-ref 16 1 "C_a_u_i_pointer_u32_ref" #f words-per-flonum)
-(rewrite 'chicken.memory#pointer-s32-ref 16 1 "C_a_u_i_pointer_s32_ref" #f words-per-flonum)
+(rewrite 'chicken.memory#pointer-u32-ref 16 1 "C_a_u_i_pointer_u32_ref" #f 5)
+(rewrite 'chicken.memory#pointer-s32-ref 16 1 "C_a_u_i_pointer_s32_ref" #f 5)
 (rewrite 'chicken.memory#pointer-f32-ref 16 1 "C_a_u_i_pointer_f32_ref" #f words-per-flonum)
 (rewrite 'chicken.memory#pointer-f64-ref 16 1 "C_a_u_i_pointer_f64_ref" #f words-per-flonum)
 
